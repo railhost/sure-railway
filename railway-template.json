@@ -1,6 +1,6 @@
 {
-  "name": "Sure",
-  "description": "Track your money in one place: accounts, budgets, investments and net worth, on your own server.",
+  "name": "Sure | Self-Hosted Personal Finance (Maybe Fork)",
+  "description": "Self-hosted personal finance app, the Maybe fork. Net worth, budgets, investments and bank sync. Locked signup, tested updates.",
   "category": "Other",
   "services": {
     "1f5d1f2f-284d-4067-958d-994c636a9e45": {

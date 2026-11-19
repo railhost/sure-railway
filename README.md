@@ -1,8 +1,8 @@
 # Sure on Railway
 
-Run [Sure](https://github.com/we-promise/sure), the open-source personal finance app (a community fork of Maybe), on Railway with Postgres and Redis. Track bank accounts, budgets, investments and net worth in one place, on a server only you control.
+Run [Sure](https://github.com/we-promise/sure), the open-source personal finance app forked from Maybe, on Railway with Postgres and Redis. A self-hosted alternative to Mint, YNAB and Monarch Money: track bank accounts, budgets, investments and net worth on a server only you control.
 
-[![Deploy on Railway](https://railway.com/button.svg)](https://railway.com/deploy/FVYvkk?utm_medium=integration&utm_source=template&utm_campaign=sure)
+[![Deploy on Railway](https://railway.com/button.svg)](https://railway.com/deploy/fE4aoE?utm_medium=integration&utm_source=template&utm_campaign=sure)
 
 ## What you get
 
