@@ -2,7 +2,7 @@
 
 Run [Sure](https://github.com/we-promise/sure), the open-source personal finance app (a community fork of Maybe), on Railway with Postgres and Redis. Track bank accounts, budgets, investments and net worth in one place, on a server only you control.
 
-[![Deploy on Railway](https://railway.com/button.svg)](https://railway.com/deploy/sure?utm_medium=integration&utm_source=template&utm_campaign=sure)
+[![Deploy on Railway](https://railway.com/button.svg)](https://railway.com/deploy/FVYvkk?utm_medium=integration&utm_source=template&utm_campaign=sure)
 
 ## What you get
 
