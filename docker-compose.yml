@@ -1,0 +1,61 @@
+# Local copy of the Railway setup: Sure plus Postgres and Redis, each with a
+# volume. Used by scripts/smoke-test.sh. The values below are for local testing only.
+name: sure-smoke
+
+services:
+  postgres:
+    image: ghcr.io/railwayapp-templates/postgres-ssl:18
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: smoke-postgres-password
+      POSTGRES_DB: railway
+      PGDATA: /var/lib/postgresql/data/pgdata
+    volumes:
+      - postgres:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD", "pg_isready", "-U", "postgres", "-d", "railway"]
+      interval: 2s
+      timeout: 5s
+      retries: 30
+
+  redis:
+    image: redis:8.2
+    command: ["redis-server", "--requirepass", "smoke-redis-password", "--save", "60", "1"]
+    volumes:
+      - redis:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "-a", "smoke-redis-password", "ping"]
+      interval: 2s
+      timeout: 5s
+      retries: 30
+
+  sure:
+    build: .
+    image: sure-smoke:latest
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    ports:
+      - "${SMOKE_PORT:-39300}:8080"
+    environment:
+      DB_HOST: postgres
+      DB_PORT: "5432"
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: smoke-postgres-password
+      POSTGRES_DB: railway
+      REDIS_URL: redis://default:smoke-redis-password@redis:6379
+      SECRET_KEY_BASE: ${SMOKE_SECRET_KEY_BASE:-smoke-secret-key-base-at-least-64-characters-long-0123456789abcdef}
+      ADMIN_EMAIL: ${SMOKE_ADMIN_EMAIL:-admin@example.com}
+      ADMIN_PASSWORD: ${SMOKE_ADMIN_PASSWORD:-smoke-admin-password}
+      APP_DOMAIN: 127.0.0.1
+      # Local HTTP: without this, Rails marks cookies secure and curl drops them.
+      RAILS_ASSUME_SSL: "false"
+    volumes:
+      - storage:/rails/storage
+
+volumes:
+  postgres:
+  redis:
+  storage:

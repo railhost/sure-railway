@@ -1,0 +1,209 @@
+{
+  "name": "Sure",
+  "description": "Track your money in one place: accounts, budgets, investments and net worth, on your own server.",
+  "category": "Other",
+  "services": {
+    "1f5d1f2f-284d-4067-958d-994c636a9e45": {
+      "name": "Sure",
+      "source": {
+        "repo": "railhost/sure-railway"
+      },
+      "deploy": {
+        "healthcheckPath": "/up"
+      },
+      "variables": {
+        "ADMIN_EMAIL": {
+          "defaultValue": "",
+          "description": "Email for the first user. Sure creates this user on the first boot; signup is closed.",
+          "isOptional": false
+        },
+        "ADMIN_PASSWORD": {
+          "defaultValue": "${{secret(24)}}",
+          "description": "Password for the first user. Change it at /password/edit after you log in.",
+          "isOptional": false
+        },
+        "SECRET_KEY_BASE": {
+          "defaultValue": "${{secret(64)}}",
+          "description": "Signs sessions and derives the keys that encrypt saved bank credentials. Never change it.",
+          "isOptional": false
+        },
+        "DB_HOST": {
+          "defaultValue": "${{Postgres.PGHOST}}",
+          "description": "Postgres host on the private network.",
+          "isOptional": false
+        },
+        "DB_PORT": {
+          "defaultValue": "${{Postgres.PGPORT}}",
+          "description": "Postgres port.",
+          "isOptional": false
+        },
+        "POSTGRES_USER": {
+          "defaultValue": "${{Postgres.POSTGRES_USER}}",
+          "description": "Postgres user.",
+          "isOptional": false
+        },
+        "POSTGRES_PASSWORD": {
+          "defaultValue": "${{Postgres.POSTGRES_PASSWORD}}",
+          "description": "Postgres password.",
+          "isOptional": false
+        },
+        "POSTGRES_DB": {
+          "defaultValue": "${{Postgres.POSTGRES_DB}}",
+          "description": "Postgres database.",
+          "isOptional": false
+        },
+        "REDIS_URL": {
+          "defaultValue": "${{Redis.REDIS_URL}}",
+          "description": "Redis for background jobs.",
+          "isOptional": false
+        },
+        "APP_DOMAIN": {
+          "defaultValue": "${{RAILWAY_PUBLIC_DOMAIN}}",
+          "description": "Public domain used in links in emails. Set it to your own domain if you add one.",
+          "isOptional": false
+        },
+        "OPENAI_ACCESS_TOKEN": {
+          "defaultValue": "",
+          "description": "Optional. An OpenAI API key turns on the AI chat and automatic categories. You pay OpenAI for use.",
+          "isOptional": true
+        }
+      },
+      "networking": {
+        "serviceDomains": {
+          "<hasDomain>:8080": {
+            "port": 8080
+          }
+        }
+      },
+      "volumeMounts": {
+        "1f5d1f2f-284d-4067-958d-994c636a9e45": {
+          "mountPath": "/rails/storage"
+        }
+      }
+    },
+    "91b2596e-2b1d-4f26-987d-4414513de471": {
+      "name": "Postgres",
+      "icon": "https://devicons.railway.app/i/postgresql.svg",
+      "source": {
+        "image": "ghcr.io/railwayapp-templates/postgres-ssl:18"
+      },
+      "deploy": {
+        "requiredMountPath": "/var/lib/postgresql/data"
+      },
+      "variables": {
+        "PGDATA": {
+          "isOptional": false,
+          "description": "Location where the database will be initialized",
+          "defaultValue": "/var/lib/postgresql/data/pgdata"
+        },
+        "PGHOST": {
+          "isOptional": false,
+          "description": "Railway Private Domain Name.",
+          "defaultValue": "${{RAILWAY_PRIVATE_DOMAIN}}"
+        },
+        "PGPORT": {
+          "isOptional": false,
+          "description": "Port to connect to Postgres.",
+          "defaultValue": "5432"
+        },
+        "PGUSER": {
+          "isOptional": false,
+          "description": "Required variable for Data panel",
+          "defaultValue": "${{ POSTGRES_USER }}"
+        },
+        "PGDATABASE": {
+          "isOptional": false,
+          "description": "Required variable for the data panel.",
+          "defaultValue": "${{POSTGRES_DB}}"
+        },
+        "PGPASSWORD": {
+          "isOptional": false,
+          "description": "Required variable for Data panel",
+          "defaultValue": "${{POSTGRES_PASSWORD}}"
+        },
+        "POSTGRES_DB": {
+          "isOptional": false,
+          "description": "Default database created when image is started.",
+          "defaultValue": "railway"
+        },
+        "DATABASE_URL": {
+          "isOptional": false,
+          "description": "URL to connect to Postgres database.",
+          "defaultValue": "postgresql://${{PGUSER}}:${{POSTGRES_PASSWORD}}@${{RAILWAY_PRIVATE_DOMAIN}}:5432/${{PGDATABASE}}"
+        },
+        "POSTGRES_USER": {
+          "isOptional": false,
+          "description": "User to connect to Postgres DB",
+          "defaultValue": "postgres"
+        },
+        "SSL_CERT_DAYS": {
+          "isOptional": true,
+          "description": "SSL certificate expiry in days.",
+          "defaultValue": "820"
+        },
+        "POSTGRES_PASSWORD": {
+          "isOptional": false,
+          "description": "Password to connect to DB",
+          "defaultValue": "${{ secret(32, \"abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ\") }}"
+        },
+        "RAILWAY_DEPLOYMENT_DRAINING_SECONDS": {
+          "isOptional": false,
+          "description": "Allow Postgres to cleanly shut down",
+          "defaultValue": "60"
+        }
+      },
+      "volumeMounts": {
+        "91b2596e-2b1d-4f26-987d-4414513de471": {
+          "mountPath": "/var/lib/postgresql/data"
+        }
+      }
+    },
+    "a6506cd0-49e1-477c-adbc-484299e7d635": {
+      "name": "Redis",
+      "icon": "https://cdn.sanity.io/images/sy1jschh/production/0ce0bfdcfbdbf69662b1116671f97c2dd788b655-157x157.svg",
+      "source": {
+        "image": "redis:8.2"
+      },
+      "deploy": {
+        "startCommand": "/bin/sh -c \"rm -rf $RAILWAY_VOLUME_MOUNT_PATH/lost+found/ && exec docker-entrypoint.sh redis-server --requirepass $REDIS_PASSWORD --save 60 1 --dir $RAILWAY_VOLUME_MOUNT_PATH\""
+      },
+      "variables": {
+        "REDISHOST": {
+          "isOptional": false,
+          "description": "Private network hostname of the Redis service, only resolvable from services in the same environment",
+          "defaultValue": "${{RAILWAY_PRIVATE_DOMAIN}}"
+        },
+        "REDISPORT": {
+          "isOptional": false,
+          "description": "Port that Redis listens on",
+          "defaultValue": "6379"
+        },
+        "REDISUSER": {
+          "isOptional": false,
+          "description": "Username for authenticating with Redis",
+          "defaultValue": "default"
+        },
+        "REDIS_URL": {
+          "isOptional": false,
+          "description": "Connection string for connecting to Redis using the private network",
+          "defaultValue": "redis://${{ REDISUSER }}:${{ REDIS_PASSWORD }}@${{ REDISHOST }}:${{ REDISPORT }}"
+        },
+        "REDISPASSWORD": {
+          "isOptional": false,
+          "description": "Alias of REDIS_PASSWORD for clients that expect the unseparated name",
+          "defaultValue": "${{REDIS_PASSWORD}}"
+        },
+        "REDIS_PASSWORD": {
+          "isOptional": false,
+          "description": "Randomly generated password for authenticating with Redis",
+          "defaultValue": "${{ secret(32, \"abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ\") }}"
+        }
+      },
+      "volumeMounts": {
+        "a6506cd0-49e1-477c-adbc-484299e7d635": {
+          "mountPath": "/data"
+        }
+      }
+    }
+  }
+}
